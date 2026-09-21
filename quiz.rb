@@ -1,4 +1,6 @@
 require_relative "question"
+require_relative "multiple_choice"
+require_relative "true_false"
 require "sqlite3"
 
 class Quiz
@@ -11,34 +13,44 @@ class Quiz
 
   def run
     questions.each do |q|
-      puts q.prompt
-
-      i = 0
-      while i < 2
-        reply = gets.chomp
-
-        if q.correct?(reply)
-          puts "Rätt!"
-          @score += 1
-          break
-        else
-          if i == 0
-            puts "Fel. Ledtråd för första bokstaven: #{q.hint}"
+      reply = q.ask
+      if q.correct?(reply)
+        puts "Rätt!"
+        @score += 1
+      else
+        if !q.hint.nil?
+          puts "Fel. Ledtråd för första bokstaven: #{q.hint}"
+          reply = q.ask
+          if q.correct?(reply)
+            puts "Rätt!"
+            @score += 1
           else
             puts "Fel. Rätt svar: #{q.answer}"
           end
+        else
+          puts "Fel. Rätt svar: #{q.answer}"
         end
-
-        i += 1
       end
     end
   end
 end
 
 db = SQLite3::Database.new "quiz.db"
-questions = db.execute("SELECT * FROM questions").map do |(p, a)|
-  Question.new(p, a)
+questions = db.execute("SELECT * FROM questions").map do |(prompt, answer, type, alternatives)|
+  if type == "question"
+    Question.new(prompt, answer)
+  elsif type == "multiple_choice"
+    alts = alternatives.split(",")
+    MultipleChoice.new(prompt, alts, answer)
+  elsif type == "true_false"
+    TrueFalse.new(prompt, answer == "sant")
+  else
+    raise ArgumentError, "invalid type for question"    
+  end
 end
+
+#questions << MultipleChoice.new("Vad heter huvudstaden i Norge?", ["Bergen", "Helsinki", "Oslo"], "Oslo")
+#questions << TrueFalse.new("Oslo ligger i Norge", true)
 
 quiz = Quiz.new(questions)
 

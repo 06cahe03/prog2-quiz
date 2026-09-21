@@ -2,12 +2,8 @@ class Question
   attr_reader :prompt, :answer
 
   def initialize(prompt, answer)
-    if prompt.empty?
-      raise ArgumentError, "prompt must not be empty"
-    end
-    if answer.empty?
-      raise ArgumentError, "answer must not be empty"
-    end
+    raise ArgumentError, "prompt must not be empty" if prompt.empty?
+    raise ArgumentError, "answer must not be empty" if answer.to_s.empty?
 
     @prompt = prompt
     @answer = answer
@@ -25,10 +21,10 @@ class Question
   #  @answer = new_answer
   #end
 
-  #def ask
-  #  puts prompt
-  #  gets.chomp
-  #end
+  def ask
+    puts prompt
+    gets.chomp
+  end
 
   def correct?(reply)
     reply.strip.downcase == answer.downcase
