@@ -1,6 +1,8 @@
 require_relative "question"
 require_relative "multiple_choice"
 require_relative "true_false"
+require_relative "numeric_question"
+require_relative "self_graded"
 require "sqlite3"
 
 class Quiz
@@ -14,23 +16,24 @@ class Quiz
   def run
     questions.each do |q|
       reply = q.ask
-      if q.correct?(reply)
-        puts "Rätt!"
-        @score += 1
-      else
-        if !q.hint.nil?
-          puts "Fel. Ledtråd för första bokstaven: #{q.hint}"
-          reply = q.ask
-          if q.correct?(reply)
-            puts "Rätt!"
-            @score += 1
-          else
-            puts "Fel. Rätt svar: #{q.answer}"
-          end
-        else
+      if wrong?(q, reply)
+        reply = q.hint
+        if wrong?(q, reply)
           puts "Fel. Rätt svar: #{q.answer}"
         end
       end
+    end
+  end
+
+  def wrong?(q, reply)
+    if reply.nil?
+      true
+    elsif q.correct?(reply)
+      puts "Rätt!"
+      @score += 1
+      false
+    else
+      true
     end
   end
 end
@@ -44,6 +47,10 @@ questions = db.execute("SELECT * FROM questions").map do |(prompt, answer, type,
     MultipleChoice.new(prompt, alts, answer)
   elsif type == "true_false"
     TrueFalse.new(prompt, answer == "sant")
+  elsif type == "numeric_question"
+    NumericQuestion.new(prompt, answer.to_f)
+  elsif type == "self_graded"
+    SelfGraded.new(prompt, answer)
   else
     raise ArgumentError, "invalid type for question"    
   end

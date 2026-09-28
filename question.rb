@@ -9,18 +9,6 @@ class Question
     @answer = answer
   end
 
-  #def prompt
-  #  @prompt
-  #end
-
-  #def answer
-  #  @answer
-  #end
-
-  #def answer=(new_answer)
-  #  @answer = new_answer
-  #end
-
   def ask
     puts prompt
     gets.chomp
@@ -35,6 +23,7 @@ class Question
   end
 
   def hint
-    answer[0]
+    puts "Fel. Ledtråd för första bokstaven: #{answer[0]}"
+    gets.chomp
   end
 end
