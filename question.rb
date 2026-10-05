@@ -10,20 +10,20 @@ class Question
   end
 
   def ask
-    puts prompt
+    puts @prompt
     gets.chomp
   end
 
   def correct?(reply)
-    reply.strip.downcase == answer.downcase
+    reply.strip.downcase == @answer.downcase
   end
 
   def to_s
-    "#{prompt} (#{answer})"
+    "#{@prompt} (#{@answer})"
   end
 
-  def hint
-    puts "Fel. Ledtråd för första bokstaven: #{answer[0]}"
+  def hint(reply)
+    puts "Fel. Ledtråd för första bokstaven: #{@answer[0]}"
     gets.chomp
   end
 end

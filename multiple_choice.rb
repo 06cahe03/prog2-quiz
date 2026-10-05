@@ -1,8 +1,6 @@
 require_relative "question"
 
 class MultipleChoice < Question
-  attr_reader :alternatives
-
   def initialize(prompt, alternatives, answer)
     super(prompt, answer)
 
@@ -13,14 +11,14 @@ class MultipleChoice < Question
   end
 
   def ask
-    puts prompt
-    alternatives.each_with_index do |x, i|
+    puts @prompt
+    @alternatives.each_with_index do |x, i|
       puts "#{i + 1}. #{x}"
     end
     gets.chomp
   end
 
   def correct?(reply)
-    reply.strip.to_i == alternatives.find_index(answer) + 1
+    reply.strip.to_i == @alternatives.find_index(@answer) + 1
   end
 end
